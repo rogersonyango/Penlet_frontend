@@ -1,60 +1,78 @@
-import axios from 'axios';
-import { API_BASE_URL, STORAGE_KEYS } from '../config/api';
+// src/services/api.js
 
-const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 30000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+const API_URL = "http://localhost:8000/api/v1";
 
-// Request interceptor
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+// Register User
+export const registerUser = async (userData) => {
+  try {
+    const response = await fetch(`${API_URL}/users/registration`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData)
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.detail || 'Registration failed');
     }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
+    
+    const data = await response.json();
+    
+    // Store token in localStorage
+    localStorage.setItem('access_token', data.access_token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    
+    return data;
+  } catch (error) {
+    console.error('Registration error:', error);
+    throw error;
   }
-);
+};
 
-// Response interceptor
-apiClient.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-
-    // If token expired, try to refresh
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      try {
-        const refreshToken = localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
-        const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
-          refreshToken,
-        });
-
-        const { token } = response.data;
-        localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
-        
-        originalRequest.headers.Authorization = `Bearer ${token}`;
-        return apiClient(originalRequest);
-      } catch (refreshError) {
-        // Refresh failed, redirect to login
-        localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
-        localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
-        window.location.href = '/login';
-        return Promise.reject(refreshError);
-      }
+// Login User
+export const loginUser = async (credentials) => {
+  try {
+    const response = await fetch(`${API_URL}/users/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(credentials)
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.detail || 'Login failed');
     }
-
-    return Promise.reject(error);
+    
+    const data = await response.json();
+    
+    // Store token in localStorage
+    localStorage.setItem('access_token', data.access_token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    
+    return data;
+  } catch (error) {
+    console.error('Login error:', error);
+    throw error;
   }
-);
+};
 
-export default apiClient;
+// Get current user (from localStorage)
+export const getCurrentUser = () => {
+  const user = localStorage.getItem('user');
+  return user ? JSON.parse(user) : null;
+};
+
+// Logout
+export const logoutUser = () => {
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('user');
+};
+
+// Get auth token
+export const getAuthToken = () => {
+  return localStorage.getItem('access_token');
+};
