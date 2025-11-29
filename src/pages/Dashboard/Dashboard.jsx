@@ -1,26 +1,58 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  FileText, Brain, Video, Calendar, TrendingUp, Clock, BookOpen, Award
+  FileText, Brain, Video, Calendar, TrendingUp, Clock, BookOpen, Award, Target, Zap
 } from 'lucide-react';
-import { mockAnalytics, mockSubjects, mockNotes } from '../../services/mockData';
+import { useAuthStore } from '../../store/authStore';
 
 const Dashboard = () => {
+  const { user } = useAuthStore();
+  
+  // You can replace these with actual API calls
   const stats = [
-    { icon: FileText, label: 'Total Notes', value: '24', color: 'bg-blue-500', link: '/notes' },
-    { icon: Brain, label: 'Quizzes Taken', value: '12', color: 'bg-purple-500', link: '/quizzes' },
-    { icon: Video, label: 'Videos Watched', value: '45', color: 'bg-pink-500', link: '/videos' },
-    { icon: Award, label: 'Achievements', value: '8', color: 'bg-yellow-500', link: '/analytics' },
+    { icon: FileText, label: 'Total Notes', value: '24', color: 'from-blue-500 to-blue-600', link: '/notes' },
+    { icon: Brain, label: 'Quizzes Taken', value: '12', color: 'from-purple-500 to-purple-600', link: '/quizzes' },
+    { icon: Video, label: 'Videos Watched', value: '45', color: 'from-pink-500 to-pink-600', link: '/videos' },
+    { icon: Award, label: 'Achievements', value: '8', color: 'from-yellow-500 to-yellow-600', link: '/analytics' },
   ];
 
-  const recentNotes = mockNotes.slice(0, 3);
+  const recentNotes = [
+    { id: 1, title: 'Introduction to Physics', subject: 'Physics', color: '#3b82f6' },
+    { id: 2, title: 'Chemical Reactions', subject: 'Chemistry', color: '#10b981' },
+    { id: 3, title: 'Calculus Basics', subject: 'Mathematics', color: '#f97316' }
+  ];
+
+  const studyTime = {
+    today: { hours: 2, minutes: 0 },
+    thisWeek: { hours: 14, minutes: 0 }
+  };
 
   return (
     <div className="space-y-6 animate-fade-in">
-      {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl p-6 text-white">
-        <h1 className="text-3xl font-bold mb-2">Welcome back, John! 👋</h1>
-        <p className="text-primary-100">Here's what's happening with your studies today</p>
+      {/* Welcome Banner - Updated with purple gradient */}
+      <div 
+        className="rounded-xl p-6 text-white relative overflow-hidden"
+        style={{
+          background: 'linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)',
+          boxShadow: '0 8px 24px rgba(147, 51, 234, 0.3)'
+        }}
+      >
+        <div className="relative z-10">
+          <h1 className="text-3xl font-bold mb-2">
+            Welcome back, {user?.name || 'Student'}! 👋
+          </h1>
+          <p className="text-purple-100">
+            Here's what's happening with your studies today
+          </p>
+        </div>
+        {/* Decorative circle */}
+        <div 
+          className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-10"
+          style={{
+            background: 'radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%)',
+            transform: 'translate(30%, -30%)'
+          }}
+        />
       </div>
 
       {/* Stats Grid */}
@@ -31,15 +63,20 @@ const Dashboard = () => {
             <Link
               key={index}
               to={stat.link}
-              className="card hover:shadow-lg transition-shadow cursor-pointer"
+              className="card hover:shadow-xl transition-all transform hover:-translate-y-1"
+              style={{
+                animationDelay: `${index * 100}ms`
+              }}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
+                  <p className="text-sm text-gray-600 font-medium mb-1">{stat.label}</p>
                   <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
                 </div>
-                <div className={`${stat.color} p-3 rounded-lg`}>
-                  <Icon size={24} className="text-white" />
+                <div 
+                  className={`p-3 rounded-xl bg-gradient-to-br ${stat.color} shadow-lg`}
+                >
+                  <Icon size={28} className="text-white" />
                 </div>
               </div>
             </Link>
@@ -47,93 +84,127 @@ const Dashboard = () => {
         })}
       </div>
 
-      {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Notes */}
-        <div className="card">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900">Recent Notes</h2>
-            <Link to="/notes" className="text-sm text-primary-600 hover:text-primary-700">
-              View all
-            </Link>
-          </div>
-          <div className="space-y-3">
-            {recentNotes.map((note) => {
-              const subject = mockSubjects.find(s => s.id === note.subjectId);
-              return (
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Recent Notes - Takes 2 columns */}
+        <div className="lg:col-span-2">
+          <div className="card">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-gray-900">Recent Notes</h2>
+              <Link 
+                to="/notes" 
+                className="text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors"
+              >
+                View all
+              </Link>
+            </div>
+            <div className="space-y-3">
+              {recentNotes.map((note) => (
                 <Link
                   key={note.id}
                   to={`/notes/${note.id}`}
-                  className="block p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="block p-4 rounded-xl hover:bg-gray-50 transition-all border-l-4 hover:shadow-md"
+                  style={{ borderLeftColor: note.color }}
                 >
-                  <div className="flex items-start space-x-3">
+                  <div className="flex items-center space-x-4">
                     <div 
-                      className="w-10 h-10 rounded-lg flex items-center justify-center text-white"
-                      style={{ backgroundColor: subject?.color }}
+                      className="w-12 h-12 rounded-lg flex items-center justify-center text-white shadow-md"
+                      style={{ backgroundColor: note.color }}
                     >
-                      <FileText size={20} />
+                      <FileText size={24} />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-gray-900 truncate">{note.title}</h3>
-                      <p className="text-sm text-gray-500">{subject?.name}</p>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900">{note.title}</h3>
+                      <p className="text-sm text-gray-600">{note.subject}</p>
                     </div>
                   </div>
                 </Link>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Study Time */}
-        <div className="card">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Study Time</h2>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
-              <div className="flex items-center space-x-3">
-                <Clock size={24} className="text-blue-600" />
-                <div>
-                  <p className="text-sm text-gray-600">Today</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {Math.floor(mockAnalytics.studyTime.today / 60)}h {mockAnalytics.studyTime.today % 60}m
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
-              <div className="flex items-center space-x-3">
-                <TrendingUp size={24} className="text-green-600" />
-                <div>
-                  <p className="text-sm text-gray-600">This Week</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {Math.floor(mockAnalytics.studyTime.week / 60)}h {mockAnalytics.studyTime.week % 60}m
-                  </p>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Quick Actions */}
-      <div className="card">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Link to="/notes/new" className="btn btn-outline flex items-center justify-center space-x-2">
-            <FileText size={20} />
-            <span>New Note</span>
-          </Link>
-          <Link to="/quizzes" className="btn btn-outline flex items-center justify-center space-x-2">
-            <Brain size={20} />
-            <span>Take Quiz</span>
-          </Link>
-          <Link to="/timetable" className="btn btn-outline flex items-center justify-center space-x-2">
-            <Calendar size={20} />
-            <span>View Schedule</span>
-          </Link>
-          <Link to="/chatbot" className="btn btn-outline flex items-center justify-center space-x-2">
-            <BookOpen size={20} />
-            <span>AI Help</span>
-          </Link>
+        {/* Study Time - Takes 1 column */}
+        <div className="space-y-6">
+          {/* Study Time Card */}
+          <div className="card">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">Study Time</h2>
+            
+            <div className="space-y-4">
+              <div 
+                className="p-4 rounded-xl"
+                style={{
+                  background: 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)'
+                }}
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center shadow-md">
+                    <Clock size={20} className="text-white" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">Today</span>
+                </div>
+                <p className="text-3xl font-bold text-blue-600">
+                  {studyTime.today.hours}h {studyTime.today.minutes}m
+                </p>
+              </div>
+
+              <div 
+                className="p-4 rounded-xl"
+                style={{
+                  background: 'linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%)'
+                }}
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center shadow-md">
+                    <TrendingUp size={20} className="text-white" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">This Week</span>
+                </div>
+                <p className="text-3xl font-bold text-purple-600">
+                  {studyTime.thisWeek.hours}h {studyTime.thisWeek.minutes}m
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Actions Card */}
+          <div className="card">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
+            
+            <div className="space-y-3">
+              <Link
+                to="/notes/new"
+                className="btn btn-primary w-full flex items-center justify-center gap-2"
+              >
+                <FileText size={20} />
+                New Note
+              </Link>
+              
+              <Link
+                to="/quizzes"
+                className="btn w-full flex items-center justify-center gap-2 bg-white border-2 border-purple-200 text-purple-600 hover:bg-purple-50 font-medium"
+              >
+                <Target size={20} />
+                Take Quiz
+              </Link>
+              
+              <Link
+                to="/timetable"
+                className="btn w-full flex items-center justify-center gap-2 bg-white border-2 border-purple-200 text-purple-600 hover:bg-purple-50 font-medium"
+              >
+                <Calendar size={20} />
+                View Schedule
+              </Link>
+              
+              <Link
+                to="/chatbot"
+                className="btn w-full flex items-center justify-center gap-2 bg-white border-2 border-purple-200 text-purple-600 hover:bg-purple-50 font-medium"
+              >
+                <Zap size={20} />
+                AI Help
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </div>
