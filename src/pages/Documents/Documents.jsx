@@ -28,7 +28,7 @@ import {
   performOCR,
   enhanceDocument,
   convertToPDF
-} from '../../services/scannerApi';
+} from '../../services/documentsApi';
 import toast from 'react-hot-toast';
 
 const CamScanner = () => {
