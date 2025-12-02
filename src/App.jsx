@@ -17,7 +17,11 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import Notes from './pages/Notes/Notes';
 import NoteEditor from './pages/Notes/NoteEditor';
 import Subjects from './pages/Subjects/Subjects';
-import Timetable from './pages/Timetable/Timetable';
+
+import TimetablePage from './pages/timetable/TimetablePage';
+import DailyTimetablePage from './pages/timetable/DailyTimetablePage';
+import TimetableEditorPage from './pages/timetable/TimetableEditorPage';
+
 import Chatbot from './pages/Chatbot/Chatbot';
 import Chatroom from './pages/Chatroom/Chatroom';
 import Quizzes from './pages/Quizzes/Quizzes';
@@ -32,11 +36,11 @@ import Analytics from './pages/Analytics/Analytics';
 import Settings from './pages/Settings/Settings';
 import Profile from './pages/Profile/Profile';
 
-// Protected Route Component
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated } = useAuthStore();
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
-};
+// // Protected Route Component
+// const ProtectedRoute = ({ children }) => {
+//   const { isAuthenticated } = useAuthStore();
+//   return isAuthenticated ? children : <Navigate to="/login" replace />;
+// };
 
 // Public Route Component (redirect to dashboard if authenticated)
 const PublicRoute = ({ children }) => {
@@ -78,53 +82,32 @@ function App() {
       
       <Routes>
         {/* Public Routes */}
+        {/* <Route path="/login" element={<PublicRoute> <AuthLayout> <Login /> </AuthLayout></PublicRoute>}/>
+        <Route path="/register" element={ <PublicRoute> <AuthLayout> <Register /> </AuthLayout> </PublicRoute> }/>
         <Route
-          path="/login"
-          element={
-            <PublicRoute>
-              <AuthLayout>
-                <Login />
-              </AuthLayout>
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            <PublicRoute>
-              <AuthLayout>
-                <Register />
-              </AuthLayout>
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/forgot-password"
-          element={
-            <PublicRoute>
-              <AuthLayout>
-                <ForgotPassword />
-              </AuthLayout>
-            </PublicRoute>
-          }
-        />
+          path="/forgot-password" element={ <PublicRoute> <AuthLayout> <ForgotPassword /> </AuthLayout></PublicRoute>}/> */}
+          <Route path="/timetable/daily" element={<DailyTimetablePage />} />
+          <Route path="/timetable/page" element={<TimetablePage />} />
+          <Route path="/timetable/create" element={<TimetableEditorPage />} />
+          <Route path="/timetable/edit/:id" element={<TimetableEditorPage />} />
+
+
+
+
 
         {/* Protected Routes */}
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Layout />
-            </ProtectedRoute>
-          }
-        >
+        <Route path="/" element={ <ProtectedRoute> <Layout /> </ProtectedRoute>}>
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="notes" element={<Notes />} />
           <Route path="notes/new" element={<NoteEditor />} />
           <Route path="notes/:id" element={<NoteEditor />} />
           <Route path="subjects" element={<Subjects />} />
-          <Route path="timetable" element={<Timetable />} />
+
+          {/* <Route path="timetable/daily" element={<DailyTimetablePage />} />
+          <Route path="timetable/create" element={<TimetableEditorPage />} />
+          <Route path="timetable/edit/:id" element={<TimetableEditorPage />} /> */}
+
           <Route path="chatbot" element={<Chatbot />} />
           <Route path="chatroom" element={<Chatroom />} />
           <Route path="quizzes" element={<Quizzes />} />

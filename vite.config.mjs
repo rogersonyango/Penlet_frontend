@@ -57,6 +57,8 @@ export default defineConfig({
         ]
       },
       workbox: {
+        navigateFallback: '/', // fallback to index.html
+        navigateFallbackAllowlist: [/^\/timetable/, /^\/login/, /^\/register/],
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         runtimeCaching: [
           {
