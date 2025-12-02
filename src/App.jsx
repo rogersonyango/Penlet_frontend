@@ -23,13 +23,13 @@ import DailyTimetablePage from './pages/timetable/DailyTimetablePage';
 import TimetableEditorPage from './pages/timetable/TimetableEditorPage';
 
 import Chatbot from './pages/Chatbot/Chatbot';
-import Chatroom from './pages/Chatroom/Chatroom';
+// import Chatroom from './pages/Chatroom/Chatroom';
 import Quizzes from './pages/Quizzes/Quizzes';
 import QuizDetail from './pages/Quizzes/QuizDetail';
 import Videos from './pages/Videos/Videos';
 import Flashcards from './pages/Flashcards/Flashcards';
 import Games from './pages/Games/Games';
-import Documents from './pages/Documents/Documents';
+// import Documents from './pages/Documents/Documents';
 import Resources3D from './pages/Resources3D/Resources3D';
 import Alarms from './pages/Alarms/Alarms';
 import Analytics from './pages/Analytics/Analytics';
@@ -109,13 +109,13 @@ function App() {
           <Route path="timetable/edit/:id" element={<TimetableEditorPage />} /> */}
 
           <Route path="chatbot" element={<Chatbot />} />
-          <Route path="chatroom" element={<Chatroom />} />
+          {/* <Route path="chatroom" element={<Chatroom />} /> */}
           <Route path="quizzes" element={<Quizzes />} />
           <Route path="quizzes/:id" element={<QuizDetail />} />
           <Route path="videos" element={<Videos />} />
           <Route path="flashcards" element={<Flashcards />} />
           <Route path="games" element={<Games />} />
-          <Route path="documents" element={<Documents />} />
+          {/* <Route path="documents" element={<Documents />} /> */}
           <Route path="resources-3d" element={<Resources3D />} />
           <Route path="alarms" element={<Alarms />} />
           <Route path="analytics" element={<Analytics />} />
