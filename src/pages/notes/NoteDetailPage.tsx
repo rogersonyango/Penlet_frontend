@@ -1,7 +1,16 @@
 // src/pages/notes/NoteDetailPage.tsx
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { addComment, deleteComment, downloadNote, getComments, getNote, toggleFavorite, toggleLike } from '../../services/notes/noteServices';
+import {
+  addComment,
+  deleteComment,
+  downloadNote,
+  getComments,
+  getNote,
+  toggleFavorite,
+  toggleLike
+} from '../../services/notes/noteServices';
+
 import { CommentsSection } from './CommentsSection';
 
 export default function NoteDetailPage() {
@@ -20,42 +29,68 @@ export default function NoteDetailPage() {
     enabled: !!noteId,
   });
 
-  if (isLoading) return <div className="p-6">Loading...</div>;
-  if (!note) return <div>Note not found</div>;
+  if (isLoading) return <div className="p-6 text-text-secondary">Loading...</div>;
+  if (!note) return <div className="p-6 text-red-500">Note not found</div>;
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-text-primary">{note.title}</h1>
-        <p className="text-sm text-gray-500">
-          Curriculum: {note.curriculum} • Views: {note.view_count}
+
+      {/* Title */}
+      <div className="mb-8">
+        <h1 className="text-4xl font-extrabold bg-gradient-primary text-transparent bg-clip-text">
+          {note.title}
+        </h1>
+
+        <p className="text-sm text-text-secondary mt-1">
+          Curriculum: <span className="font-medium">{note.curriculum}</span> • Views:{' '}
+          <span className="font-medium">{note.view_count}</span>
         </p>
       </div>
 
-      <div className="prose max-w-none mb-8" dangerouslySetInnerHTML={{ __html: note.content.replace(/\n/g, '<br>') }} />
+      {/* Content Card */}
+      <div className="bg-white p-6 rounded-card shadow-card border border-pink-light mb-10">
+        <div
+          className="prose max-w-none text-text-primary"
+          dangerouslySetInnerHTML={{
+            __html: note.content.replace(/\n/g, '<br>')
+          }}
+        />
+      </div>
 
-      <div className="flex gap-3 mb-8">
+      {/* Action Buttons */}
+      <div className="flex flex-wrap gap-4 mb-12">
         <button
           onClick={() => toggleLike(noteId)}
-          className="bg-primary-500 text-white px-4 py-2 rounded-button"
+          className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 
+                     rounded-button shadow-button font-semibold transition-all"
         >
-          Like
+          ❤️ Like
         </button>
+
         <button
           onClick={() => toggleFavorite(noteId)}
-          className="border border-primary-500 text-primary-500 px-4 py-2 rounded-button"
+          className="border border-primary-500 text-primary-600 hover:bg-primary-50 
+                     px-6 py-3 rounded-button font-semibold transition-all"
         >
-          Favorite
+          ⭐ Favorite
         </button>
+
         <button
           onClick={() => downloadNote(noteId)}
-          className="bg-blue-card text-white px-4 py-2 rounded-button"
+          className="bg-blue-card hover:bg-blue-dark text-white px-6 py-3 
+                     rounded-button shadow-button font-semibold transition-all"
         >
-          Download PDF
+          ⬇️ Download PDF
         </button>
       </div>
 
-      <CommentsSection noteId={noteId} comments={comments} onAdd={addComment} onDelete={deleteComment} />
+      {/* Comments */}
+      <CommentsSection
+        noteId={noteId}
+        comments={comments}
+        onAdd={addComment}
+        onDelete={deleteComment}
+      />
     </div>
   );
 }
