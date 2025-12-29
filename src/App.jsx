@@ -130,16 +130,29 @@
 // src/App.jsx
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+// === Notes Pages (existing) ===
 import { CommentsSection } from './pages/notes/CommentsSection';
 import CreateNotePage from './pages/notes/CreateNotePage';
 import { NoteCard } from './pages/notes/NotesCard';
 import NoteDetailPage from './pages/notes/NoteDetailPage';
 import NotesListPage from './pages/notes/NotesListPage';
+
+// === Timetable Pages (existing) ===
 import TimetablePage from './pages/timetable/TimetablePage';
 import DailyTimetablePage from './pages/timetable/DailyTimetablePage';
 import TimetableEditorPage from './pages/timetable/TimetableEditorPage';
 
-// Create a client
+// === Alarms & Reminders Pages (new) ===
+import AlarmListPage from './pages/Alarms/AlarmListPage';
+import CreateAlarmPage from './pages/Alarms/CreateAlarmPage';
+import AlarmDetailPage from './pages/Alarms/AlarmDetailPage';
+import ReminderListPage from './pages/Alarms/ReminderListPage';
+import CreateReminderPage from './pages/Alarms/CreateReminderPage';
+import ReminderDetailPage from './pages/Alarms/ReminderDetailPage';
+import UpcomingRemindersPage from './pages/Alarms/UpcomingReminderPage';
+
+// Create React Query client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -154,12 +167,31 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
+          {/* === Notes Routes === */}
           <Route path="/note" element={<NotesListPage />} />
-          <Route path="/note/comments" element={<CommentsSection/>} />
+          <Route path="/note/comments" element={<CommentsSection />} />
           <Route path="/note/card" element={<NoteCard />} />
           <Route path="/note/new" element={<CreateNotePage />} />
           <Route path="/note/:id" element={<NoteDetailPage />} />
-          {/* Add other routes as needed */}
+
+          {/* === Timetable Routes === */}
+          <Route path="/timetable" element={<TimetablePage />} />
+          <Route path="/timetable/daily" element={<DailyTimetablePage />} />
+          <Route path="/timetable/edit" element={<TimetableEditorPage />} />
+
+          {/* === Alarms Routes === */}
+          <Route path="/alarms" element={<AlarmListPage />} />
+          <Route path="/alarms/new" element={<CreateAlarmPage />} />
+          <Route path="/alarms/:alarmId" element={<AlarmDetailPage />} />
+
+          {/* === Reminders Routes === */}
+          <Route path="/reminders" element={<ReminderListPage />} />
+          <Route path="/reminders/new" element={<CreateReminderPage />} />
+          <Route path="/reminders/:reminderId" element={<ReminderDetailPage />} />
+          <Route path="/reminders/upcoming" element={<UpcomingRemindersPage />} />
+
+          {/* === Default Redirect === */}
+          <Route path="/" element={<AlarmListPage />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>
