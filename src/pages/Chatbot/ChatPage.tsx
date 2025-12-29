@@ -5,7 +5,7 @@ import React, { useRef, useState } from 'react';
 // import MessageBubble from '../components/ChatUI/MessageBubble';
 // import TypingIndicator from '../components/ChatUI/TypingIndicator';
 // import HistorySidebar from '../components/ChatUI/HistorySidebar';
-import './ChatPage.css';
+// import './ChatPage.css';
 import { useChat } from '../../hooks/useChat';
 import HistorySidebar from '../../components/ChatUI/HistorySidebar';
 import MessageBubble from '../../components/ChatUI/MessageBubble';
