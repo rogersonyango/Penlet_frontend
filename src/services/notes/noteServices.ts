@@ -32,11 +32,9 @@ notesAPI.interceptors.response.use(
   }
 );
 
-// --- Helper: extract error message ---
 const getErrorMessage = (error: unknown): string => {
   if (axios.isAxiosError(error)) {
     if (error.response) {
-      // Server responded with error status
       const data = error.response.data as any;
       return data.detail || data.message || `Error ${error.response.status}`;
     }

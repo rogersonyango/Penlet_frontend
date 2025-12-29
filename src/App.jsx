@@ -143,7 +143,7 @@ import TimetablePage from './pages/timetable/TimetablePage';
 import DailyTimetablePage from './pages/timetable/DailyTimetablePage';
 import TimetableEditorPage from './pages/timetable/TimetableEditorPage';
 
-// === Alarms & Reminders Pages (new) ===
+// === Alarms & Reminders Pages (existing) ===
 import AlarmListPage from './pages/Alarms/AlarmListPage';
 import CreateAlarmPage from './pages/Alarms/CreateAlarmPage';
 import AlarmDetailPage from './pages/Alarms/AlarmDetailPage';
@@ -151,6 +151,13 @@ import ReminderListPage from './pages/Alarms/ReminderListPage';
 import CreateReminderPage from './pages/Alarms/CreateReminderPage';
 import ReminderDetailPage from './pages/Alarms/ReminderDetailPage';
 import UpcomingRemindersPage from './pages/Alarms/UpcomingReminderPage';
+
+// === ✅ NEW: Quiz Pages ===
+import QuizListPage from './pages/Quizzes/QuizListPage';
+import CreateQuizPage from './pages/Quizzes/CreateQuizPage';
+import UpdateQuizPage from './pages/Quizzes/UpdateQuizPage';
+import TakeQuizPage from './pages/Quizzes/TakeQuizPage';
+import QuizResultsPage from './pages/Quizzes/QuizResultPage';
 
 // Create React Query client
 const queryClient = new QueryClient({
@@ -189,6 +196,13 @@ export default function App() {
           <Route path="/reminders/new" element={<CreateReminderPage />} />
           <Route path="/reminders/:reminderId" element={<ReminderDetailPage />} />
           <Route path="/reminders/upcoming" element={<UpcomingRemindersPage />} />
+
+          {/* ===  Quiz Routes === */}
+          <Route path="/quizzes" element={<QuizListPage />} />
+          <Route path="/quiz/create" element={<CreateQuizPage />} />
+          <Route path="/quiz/:quizId/edit" element={<UpdateQuizPage />} />
+          <Route path="/quiz/:quizId" element={<TakeQuizPage />} />
+          <Route path="/results/:attemptId" element={<QuizResultsPage />} />
 
           {/* === Default Redirect === */}
           <Route path="/" element={<AlarmListPage />} />
