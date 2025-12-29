@@ -158,12 +158,15 @@ import UpdateQuizPage from './pages/Quizzes/UpdateQuizPage';
 import TakeQuizPage from './pages/Quizzes/TakeQuizPage';
 import QuizResultsPage from './pages/Quizzes/QuizResultPage';
 
-// === ✅ NEW: Flashcard Pages ===
+// === Flashcards Pages (existing) ===
 import DeckListPage from './pages/Flashcards/DeckListPage';
 import DeckCreatePage from './pages/Flashcards/DeckCreatePage';
 import CardManagementPage from './pages/Flashcards/CardManagementPage';
 import StudySessionPage from './pages/Flashcards/StudySessionPage';
 import PublicDecksPage from './pages/Flashcards/PublicDecksPage';
+
+// ===  Chatbot Page ===
+import ChatPage from './pages/Chatbot/ChatPage';
 
 // Create React Query client
 const queryClient = new QueryClient({
@@ -180,6 +183,9 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
+          {/* === Chatbot Route === */}
+          <Route path="/chat" element={<ChatPage />} />
+
           {/* === Notes Routes === */}
           <Route path="/note" element={<NotesListPage />} />
           <Route path="/note/comments" element={<CommentsSection />} />
@@ -210,7 +216,7 @@ export default function App() {
           <Route path="/quiz/:quizId" element={<TakeQuizPage />} />
           <Route path="/results/:attemptId" element={<QuizResultsPage />} />
 
-          {/* === ✅ Flashcards Routes === */}
+          {/* === Flashcards Routes === */}
           <Route path="/flashcards" element={<DeckListPage />} />
           <Route path="/flashcards/create" element={<DeckCreatePage />} />
           <Route path="/flashcards/:deckId/cards" element={<CardManagementPage />} />
