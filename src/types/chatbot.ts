@@ -1,4 +1,4 @@
-// src/types/chatbotTypes.ts
+// src/types/chatbot.ts
 
 export interface ChatMessage {
   id: string;
@@ -19,10 +19,16 @@ export interface SendMessageResponse {
   mode: string;
 }
 
-// NEW: For history sidebar
 export interface ConversationSummary {
   id: string;
-  title: string; // First user message or "New chat"
+  title: string;
   created_at: string;
   updated_at: string;
 }
+
+export interface ChatbotError {
+  message: string;
+  status?: number;
+  timestamp: Date;
+}
+
