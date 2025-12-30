@@ -11,6 +11,21 @@ const Navbar = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Get user role (default to student)
+  const userRole = user?.role || 'student';
+
+  // Get profile path based on role
+  const getProfilePath = () => {
+    switch (userRole) {
+      case 'teacher':
+        return '/teacher/profile';
+      case 'admin':
+        return '/admin/profile';
+      default:
+        return '/profile';
+    }
+  };
+
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -198,13 +213,14 @@ const Navbar = () => {
 
           {/* User Avatar */}
           <button 
-            onClick={() => navigate('/profile')}
+            onClick={() => navigate(getProfilePath())}
             className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white font-semibold cursor-pointer hover:shadow-lg transition-all"
             style={{
               boxShadow: '0 4px 12px rgba(147, 51, 234, 0.3)'
             }}
+            title="View Profile"
           >
-            {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+            {user?.full_name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'U'}
           </button>
         </div>
       </div>

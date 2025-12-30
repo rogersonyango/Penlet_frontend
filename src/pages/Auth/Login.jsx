@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import toast from 'react-hot-toast';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login, isLoading } = useAuthStore();
+  const [searchParams] = useSearchParams();
+  const role = searchParams.get('role'); // Get role from URL (?role=teacher)
+  
+  const { login, logout, isLoading } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -36,17 +39,55 @@ const Login = () => {
     });
 
     if (result.success) {
+      const userRole = result.user?.role || 'student';
+      
+      // Validate that user's role matches the portal they're trying to access
+      if (role && role !== userRole) {
+        // User is trying to access wrong portal
+        const roleLabels = {
+          student: 'Student',
+          teacher: 'Teacher', 
+          admin: 'Admin'
+        };
+        toast.error(`This account is registered as ${roleLabels[userRole]}. Please use the ${roleLabels[userRole]} login.`);
+        
+        // Log them out since we already logged them in
+        logout();
+        return;
+      }
+      
       toast.success('Welcome back!');
-      navigate('/dashboard');
+      
+      // Role-based redirect
+      if (userRole === 'admin') {
+        navigate('/admin/dashboard');
+      } else if (userRole === 'teacher') {
+        navigate('/teacher/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
     } else {
       toast.error(result.error || 'Login failed');
     }
   };
 
+  // Display role-specific title
+  const getRoleTitle = () => {
+    if (role === 'teacher') return 'Teacher Login';
+    if (role === 'admin') return 'Admin Login';
+    return 'Student Login';
+  };
+
+  const getRoleSubtitle = () => {
+    if (role === 'teacher') return 'Sign in to manage your classes and content';
+    if (role === 'admin') return 'Sign in to manage the system';
+    return 'Sign in to your account to continue';
+  };
+
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome back</h2>
-      <p className="text-gray-600 mb-6">Sign in to your account to continue</p>
+      <h2 className="text-2xl font-bold text-gray-900 mb-2">{getRoleTitle()}</h2>
+      <p className="text-gray-600 mb-6">{getRoleSubtitle()}</p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Email */}
@@ -125,6 +166,16 @@ const Login = () => {
           {isLoading ? 'Signing in...' : 'Sign In'}
         </button>
       </form>
+
+      {/* Back to Role Selection */}
+      <div className="mt-4 text-center">
+        <Link
+          to="/"
+          className="text-sm text-gray-600 hover:text-gray-800"
+        >
+          ← Back to role selection
+        </Link>
+      </div>
 
       {/* Sign Up Link */}
       <p className="mt-6 text-center text-sm text-gray-600">

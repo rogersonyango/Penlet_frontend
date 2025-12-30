@@ -6,7 +6,7 @@ import {
   BookOpen,
   Calendar,
   MessageSquare,
-  // Users,
+  Users,
   Brain,
   Video,
   CreditCard,
@@ -19,6 +19,11 @@ import {
   X,
   User,
   LogOut,
+  PlusCircle,
+  ClipboardList,
+  UserCog,
+  Shield,
+  CheckSquare,
 } from 'lucide-react';
 import { useAppStore } from '../../store/appStore';
 import { useAuthStore } from '../../store/authStore';
@@ -28,23 +33,86 @@ const Sidebar = () => {
   const { sidebarOpen, toggleSidebar, theme } = useAppStore();
   const { user, logout } = useAuthStore();
 
-  const menuItems = [
+  // Get user role (default to student)
+  const userRole = user?.role || 'student';
+
+  // Student menu items
+  const studentMenuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
     { icon: FileText, label: 'Notes', path: '/notes' },
     { icon: BookOpen, label: 'Subjects', path: '/subjects' },
     { icon: Calendar, label: 'Timetable', path: '/timetable' },
     { icon: MessageSquare, label: 'AI Chatbot', path: '/chatbot' },
-    // { icon: Users, label: 'Chatroom', path: '/chatroom' },
     { icon: Brain, label: 'Quizzes', path: '/quizzes' },
     { icon: Video, label: 'Videos', path: '/videos' },
     { icon: CreditCard, label: 'Flashcards', path: '/flashcards' },
     { icon: Gamepad2, label: 'Games', path: '/games' },
-    // { icon: FileImage, label: 'Documents', path: '/documents' },
     { icon: Box, label: '3D Resources', path: '/resources-3d' },
     { icon: Bell, label: 'Alarms', path: '/alarms' },
     { icon: TrendingUp, label: 'Analytics', path: '/analytics' },
     { icon: Settings, label: 'Settings', path: '/settings' },
   ];
+
+  // Teacher menu items
+  const teacherMenuItems = [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/teacher/dashboard' },
+    { icon: PlusCircle, label: 'Create Content', path: '/teacher/content/create' },
+    { icon: FileText, label: 'My Content', path: '/teacher/content' },
+    { icon: BookOpen, label: 'My Subjects', path: '/teacher/subjects' },
+    { icon: Users, label: 'Student Progress', path: '/teacher/progress' },
+    { icon: TrendingUp, label: 'Analytics', path: '/teacher/analytics' },
+    { icon: Settings, label: 'Settings', path: '/teacher/settings' },
+  ];
+
+  // Admin menu items
+  const adminMenuItems = [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
+    { icon: UserCog, label: 'User Management', path: '/admin/users' },
+    { icon: BookOpen, label: 'Subject Management', path: '/admin/subjects' },
+    { icon: FileText, label: 'All Content', path: '/admin/content' },
+    { icon: CheckSquare, label: 'Pending Approval', path: '/admin/content/pending' },
+    { icon: TrendingUp, label: 'Analytics', path: '/admin/analytics' },
+    { icon: ClipboardList, label: 'Activity Log', path: '/admin/activity' },
+    { icon: Settings, label: 'Settings', path: '/admin/settings' },
+  ];
+
+  // Select menu items based on role
+  const getMenuItems = () => {
+    switch (userRole) {
+      case 'teacher':
+        return teacherMenuItems;
+      case 'admin':
+        return adminMenuItems;
+      default:
+        return studentMenuItems;
+    }
+  };
+
+  const menuItems = getMenuItems();
+
+  // Get the home dashboard path based on role
+  const getDashboardPath = () => {
+    switch (userRole) {
+      case 'teacher':
+        return '/teacher/dashboard';
+      case 'admin':
+        return '/admin/dashboard';
+      default:
+        return '/dashboard';
+    }
+  };
+
+  // Get role badge color
+  const getRoleBadgeColor = () => {
+    switch (userRole) {
+      case 'teacher':
+        return 'bg-green-100 text-green-700';
+      case 'admin':
+        return 'bg-purple-100 text-purple-700';
+      default:
+        return 'bg-blue-100 text-blue-700';
+    }
+  };
 
   const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + '/');
 
@@ -77,7 +145,7 @@ const Sidebar = () => {
           <div className={`flex items-center justify-between px-6 py-4 border-b ${
             theme === 'dark' ? 'border-gray-700' : 'border-purple-100'
           }`}>
-            <Link to="/dashboard" className="flex items-center space-x-2">
+            <Link to={getDashboardPath()} className="flex items-center space-x-2">
               <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center shadow-md">
                 <span className="text-white font-bold text-xl">P</span>
               </div>
@@ -143,19 +211,19 @@ const Sidebar = () => {
             }`}>
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center text-white font-semibold shadow-md">
-                  {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                  {user?.full_name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'U'}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className={`font-semibold truncate text-sm ${
                     theme === 'dark' ? 'text-gray-100' : 'text-gray-900'
                   }`}>
-                    {user?.name || 'User'}
+                    {user?.full_name || user?.username || 'User'}
                   </p>
-                  <p className={`text-xs truncate ${
-                    theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                  }`}>
-                    {user?.email || 'user@example.com'}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${getRoleBadgeColor()}`}>
+                      {userRole}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

@@ -1,77 +1,59 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { STORAGE_KEYS } from '../config/api';
 
-const API_URL = "http://localhost:8000/api/v1";
+const API_URL = 'http://localhost:8000/api/v1';
 
 export const useAuthStore = create(
   persist(
     (set, get) => ({
       user: null,
       token: null,
-      refreshToken: null,
       isAuthenticated: false,
       isLoading: false,
 
-      setUser: (user) => set({ user, isAuthenticated: !!user }),
-      
-      setTokens: (token, refreshToken) => set({ token, refreshToken }),
-      
       login: async (credentials) => {
         set({ isLoading: true });
         try {
-          // REAL API CALL
           const response = await fetch(`${API_URL}/users/login`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-              email: credentials.email,
-              password: credentials.password
-            })
+            body: JSON.stringify(credentials),
           });
 
           if (!response.ok) {
             const error = await response.json();
-            throw new Error(error.detail || 'Login failed');
+            set({ isLoading: false });
+            return { success: false, error: error.detail || 'Login failed' };
           }
 
           const data = await response.json();
           
-          // Map backend response to frontend format
+          // Map user_type to role for frontend consistency
           const user = {
-            id: data.user.id,
-            email: data.user.email,
-            username: data.user.username,
-            firstName: data.user.full_name?.split(' ')[0] || '',
-            lastName: data.user.full_name?.split(' ')[1] || '',
-            avatar: data.user.avatar_url || null,
-            createdAt: data.user.created_at,
+            ...data.user,
+            role: data.user.user_type,
           };
 
           set({
-            user: user,
+            user,
             token: data.access_token,
-            refreshToken: data.access_token, // Backend doesn't have separate refresh token yet
             isAuthenticated: true,
             isLoading: false,
           });
 
-          localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, data.access_token);
-          localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, data.access_token);
-          
-          return { success: true, user: user };
+          return { success: true, user };
         } catch (error) {
+          console.error('Login error:', error);
           set({ isLoading: false });
-          return { success: false, error: error.message };
+          return { success: false, error: 'Network error. Please try again.' };
         }
       },
 
       register: async (userData) => {
         set({ isLoading: true });
         try {
-          // REAL API CALL
           const response = await fetch(`${API_URL}/users/registration`, {
             method: 'POST',
             headers: {
@@ -82,76 +64,103 @@ export const useAuthStore = create(
               username: userData.username,
               password: userData.password,
               full_name: `${userData.firstName} ${userData.lastName}`,
-              user_type: userData.userType || 'student'
-            })
+              user_type: userData.role || 'student',
+              student_class: userData.studentClass || null,
+            }),
           });
 
           if (!response.ok) {
             const error = await response.json();
-            throw new Error(error.detail || 'Registration failed');
+            set({ isLoading: false });
+            return { success: false, error: error.detail || 'Registration failed' };
           }
 
           const data = await response.json();
           
-          // Map backend response to frontend format
+          // Map user_type to role for frontend consistency
           const user = {
-            id: data.user.id,
-            email: data.user.email,
-            username: data.user.username,
-            firstName: data.user.full_name?.split(' ')[0] || '',
-            lastName: data.user.full_name?.split(' ')[1] || '',
-            avatar: data.user.avatar_url || null,
-            createdAt: data.user.created_at,
+            ...data.user,
+            role: data.user.user_type,
           };
 
           set({
-            user: user,
+            user,
             token: data.access_token,
-            refreshToken: data.access_token,
             isAuthenticated: true,
             isLoading: false,
           });
 
-          localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, data.access_token);
-          localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, data.access_token);
-
-          return { success: true, user: user };
+          return { success: true, user };
         } catch (error) {
+          console.error('Registration error:', error);
           set({ isLoading: false });
-          return { success: false, error: error.message };
+          return { success: false, error: 'Network error. Please try again.' };
         }
       },
 
       logout: () => {
-        localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
-        localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+        console.log('AuthStore: Logging out');
         set({
           user: null,
           token: null,
-          refreshToken: null,
           isAuthenticated: false,
         });
       },
 
-      checkAuth: () => {
-        const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
-        if (token && token !== 'null' && !token.startsWith('mock-jwt')) {
-          // Token exists and is not a mock token
-          set({ isAuthenticated: true });
-        } else {
-          // Clear invalid tokens
-          localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
-          localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
-          set({ isAuthenticated: false });
+      checkAuth: async () => {
+        const { token } = get();
+        
+        if (!token) {
+          console.log('AuthStore: No token found');
+          return false;
         }
+
+        try {
+          console.log('AuthStore: Checking auth with token');
+          const response = await fetch(`${API_URL}/users/me`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+
+          if (!response.ok) {
+            console.log('AuthStore: Auth check failed');
+            get().logout();
+            return false;
+          }
+
+          const userData = await response.json();
+          console.log('AuthStore: User verified', userData);
+          
+          // Map user_type to role for frontend consistency
+          const user = {
+            ...userData,
+            role: userData.user_type,
+          };
+          
+          set({
+            user,
+            isAuthenticated: true,
+          });
+          
+          return true;
+        } catch (error) {
+          console.error('AuthStore: Auth check error', error);
+          get().logout();
+          return false;
+        }
+      },
+
+      updateUser: (userData) => {
+        set({ user: userData });
       },
     }),
     {
-      name: STORAGE_KEYS.USER_DATA,
+      name: 'auth-storage',
       partialize: (state) => ({
         user: state.user,
         token: state.token,
-        refreshToken: state.refreshToken,
+        isAuthenticated: state.isAuthenticated,
       }),
     }
   )
