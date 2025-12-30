@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Mail, Lock, User, Eye, EyeOff, GraduationCap, BookOpen, Shield, School } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import toast from 'react-hot-toast';
 
 const Register = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const roleFromUrl = searchParams.get('role');
+  
   const { register, isLoading } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -16,8 +19,47 @@ const Register = () => {
     email: '',
     password: '',
     confirmPassword: '',
+    role: roleFromUrl || 'student',
+    studentClass: '',
     agreeToTerms: false,
   });
+
+  // Available class levels
+  const classLevels = [
+    { id: 'S1', name: 'Senior 1' },
+    { id: 'S2', name: 'Senior 2' },
+    { id: 'S3', name: 'Senior 3' },
+    { id: 'S4', name: 'Senior 4' },
+    { id: 'S5', name: 'Senior 5' },
+    { id: 'S6', name: 'Senior 6' },
+  ];
+
+  const roles = [
+    {
+      id: 'student',
+      name: 'Student',
+      icon: GraduationCap,
+      color: 'from-blue-500 to-blue-600',
+      borderColor: 'border-blue-500',
+      bgColor: 'bg-blue-50',
+    },
+    {
+      id: 'teacher',
+      name: 'Teacher',
+      icon: BookOpen,
+      color: 'from-green-500 to-green-600',
+      borderColor: 'border-green-500',
+      bgColor: 'bg-green-50',
+    },
+    {
+      id: 'admin',
+      name: 'Admin',
+      icon: Shield,
+      color: 'from-purple-500 to-purple-600',
+      borderColor: 'border-purple-500',
+      bgColor: 'bg-purple-50',
+    },
+  ];
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -32,6 +74,12 @@ const Register = () => {
     
     if (!formData.firstName || !formData.lastName || !formData.username || !formData.email || !formData.password) {
       toast.error('Please fill in all fields');
+      return;
+    }
+
+    // Validate student class for students
+    if (formData.role === 'student' && !formData.studentClass) {
+      toast.error('Please select your class');
       return;
     }
 
@@ -56,11 +104,21 @@ const Register = () => {
       username: formData.username,
       email: formData.email,
       password: formData.password,
+      role: formData.role,
+      studentClass: formData.role === 'student' ? formData.studentClass : null,
     });
 
     if (result.success) {
       toast.success('Account created successfully!');
-      navigate('/dashboard');
+      
+      // Role-based redirect
+      if (formData.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else if (formData.role === 'teacher') {
+        navigate('/teacher/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
     } else {
       toast.error(result.error || 'Registration failed');
     }
@@ -72,6 +130,81 @@ const Register = () => {
       <p className="text-gray-600 mb-6">Join Penlet to start your learning journey</p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Role Selection */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            I am a
+          </label>
+          <div className="grid grid-cols-3 gap-3">
+            {roles.map((role) => {
+              const Icon = role.icon;
+              const isSelected = formData.role === role.id;
+              return (
+                <button
+                  key={role.id}
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, role: role.id }))}
+                  className={`
+                    relative p-3 rounded-lg border-2 transition-all duration-200
+                    flex flex-col items-center justify-center gap-2
+                    ${isSelected 
+                      ? `${role.borderColor} ${role.bgColor}` 
+                      : 'border-gray-200 hover:border-gray-300 bg-white'
+                    }
+                  `}
+                >
+                  <div className={`
+                    p-2 rounded-full 
+                    ${isSelected 
+                      ? `bg-gradient-to-br ${role.color} text-white` 
+                      : 'bg-gray-100 text-gray-500'
+                    }
+                  `}>
+                    <Icon size={20} />
+                  </div>
+                  <span className={`text-sm font-medium ${isSelected ? 'text-gray-900' : 'text-gray-600'}`}>
+                    {role.name}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Class Selection - Only show for students */}
+        {formData.role === 'student' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="flex items-center gap-2">
+                <School size={18} className="text-gray-500" />
+                Select Your Class
+              </div>
+            </label>
+            <div className="grid grid-cols-3 gap-3">
+              {classLevels.map((cls) => {
+                const isSelected = formData.studentClass === cls.id;
+                return (
+                  <button
+                    key={cls.id}
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, studentClass: cls.id }))}
+                    className={`
+                      p-3 rounded-lg border-2 transition-all duration-200
+                      text-center font-medium
+                      ${isSelected 
+                        ? 'border-blue-500 bg-blue-50 text-blue-700' 
+                        : 'border-gray-200 hover:border-gray-300 bg-white text-gray-600'
+                      }
+                    `}
+                  >
+                    {cls.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Name Fields */}
         <div className="grid grid-cols-2 gap-4">
           <div>
