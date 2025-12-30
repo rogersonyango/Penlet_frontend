@@ -1,0 +1,8 @@
+// src/utils/formatDate.ts
+export const formatDate = (isoString: string): string => {
+  return new Date(isoString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+};
