@@ -165,8 +165,14 @@ import CardManagementPage from './pages/Flashcards/CardManagementPage';
 import StudySessionPage from './pages/Flashcards/StudySessionPage';
 import PublicDecksPage from './pages/Flashcards/PublicDecksPage';
 
-// ===  Chatbot Page ===
+// === Chatbot Page ===
 import ChatPage from './pages/Chatbot/ChatPage';
+
+// ===  3D Resources Pages ===
+import ResourcesListPage from './pages/Resources3D/ResourceListPage';
+import ResourceDetailPage from './pages/Resources3D/ResourceDetailPage';
+import AddResourcePage from './pages/Resources3D/AddResourcePage';
+import EditResourcePage from './pages/Resources3D/EditResourcePage';
 
 // Create React Query client
 const queryClient = new QueryClient({
@@ -185,6 +191,12 @@ export default function App() {
         <Routes>
           {/* === Chatbot Route === */}
           <Route path="/chat" element={<ChatPage />} />
+
+          {/* === 3D Resources Routes === */}
+          <Route path="/resources" element={<ResourcesListPage />} />
+          <Route path="/resources/new" element={<AddResourcePage />} />
+          <Route path="/resources/:id" element={<ResourceDetailPage />} />
+          <Route path="/resources/:id/edit" element={<EditResourcePage />} />
 
           {/* === Notes Routes === */}
           <Route path="/notes" element={<NotesListPage />} />
