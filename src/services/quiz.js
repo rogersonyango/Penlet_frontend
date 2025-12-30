@@ -63,10 +63,7 @@ const safeApiCall = async (promise) => {
   }
 };
 
-// === Quiz Endpoints ===
-export const fetchQuizzes = (params = {}) => {
-  return safeApiCall(api.get('/api/quizzes/', { params }));
-};
+
 
 const loadQuizzes = async () => {
     setLoading(true);
@@ -79,6 +76,12 @@ const loadQuizzes = async () => {
     }
     setLoading(false);
   };
+
+
+ // === Quiz Endpoints ===
+export const fetchQuizzes = (params = {}) => {
+  return safeApiCall(api.get('/api/quizzes/', { params }));
+}; 
 
 export const fetchQuiz = (quizId) => {
   return safeApiCall(api.get(`/api/quizzes/${quizId}/`));

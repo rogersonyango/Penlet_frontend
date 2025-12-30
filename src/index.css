@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 
-
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
@@ -39,31 +38,31 @@
 }
 
 @layer components {
-  /* Buttons - Updated for both modes */
+  /* Buttons - Updated for both modes using vibrant colors */
   .btn {
     @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
   }
 
   .btn-primary {
-    @apply bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:shadow-lg transform hover:-translate-y-0.5;
-    box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+    @apply bg-gradient-to-r from-vibrant-purple-500 to-vibrant-pink-500 text-white hover:shadow-lg transform hover:-translate-y-0.5;
+    box-shadow: 0 4px 12px rgba(175, 135, 206, 0.4);
   }
 
   .btn-primary:hover {
-    box-shadow: 0 6px 16px rgba(147, 51, 234, 0.4);
+    box-shadow: 0 6px 16px rgba(175, 135, 206, 0.5);
   }
 
   .dark .btn-primary {
-    box-shadow: 0 4px 12px rgba(147, 51, 234, 0.5);
+    box-shadow: 0 4px 12px rgba(175, 135, 206, 0.5);
   }
 
   .dark .btn-primary:hover {
-    box-shadow: 0 6px 16px rgba(147, 51, 234, 0.6);
+    box-shadow: 0 6px 16px rgba(175, 135, 206, 0.6);
   }
 
   /* Input - Enhanced for both modes */
   .input {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white;
+    @apply w-full px-4 py-2 border border-vibrant-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vibrant-purple-400 bg-white;
   }
 
   .dark .input {
@@ -132,8 +131,39 @@
     }
   }
 
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   .animate-fade-in {
     animation: fade-in 0.5s ease-out;
+  }
+
+  .animate-slideUp {
+    animation: slideUp 0.6s ease-out;
+    animation-fill-mode: both;
+  }
+
+  .animate-slideDown {
+    animation: slideDown 0.6s ease-out;
   }
 
   /* Custom scrollbar - Light mode */
@@ -151,20 +181,21 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-gradient-to-b from-primary-400 to-primary-500 rounded;
+    @apply bg-gradient-to-b from-vibrant-purple-400 to-vibrant-pink-400 rounded;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply from-primary-500 to-primary-600;
+    @apply from-vibrant-purple-500 to-vibrant-pink-500;
   }
 
   .dark ::-webkit-scrollbar-thumb {
-    @apply from-primary-600 to-primary-700;
+    @apply from-vibrant-purple-600 to-vibrant-pink-600;
   }
 
   .dark ::-webkit-scrollbar-thumb:hover {
-    @apply from-primary-700 to-primary-800;
+    @apply from-vibrant-purple-700 to-vibrant-pink-700;
   }
 
   /* Text colors for dark mode - using color values instead of @apply to avoid circular dependencies */
 }
+
