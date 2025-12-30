@@ -187,7 +187,7 @@ export default function App() {
           <Route path="/chat" element={<ChatPage />} />
 
           {/* === Notes Routes === */}
-          <Route path="/note" element={<NotesListPage />} />
+          <Route path="/notes" element={<NotesListPage />} />
           <Route path="/note/comments" element={<CommentsSection />} />
           <Route path="/note/card" element={<NoteCard />} />
           <Route path="/note/new" element={<CreateNotePage />} />
